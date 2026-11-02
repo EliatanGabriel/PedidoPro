@@ -1,0 +1,6 @@
+ALTER TABLE "Company"
+  ADD COLUMN "businessHours" TEXT,
+  ADD COLUMN "deliveryFeeCents" INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN "acceptsPickup" BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN "acceptsDelivery" BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN "publicPaymentMethods" JSONB NOT NULL DEFAULT '["PIX","CASH"]'::jsonb;

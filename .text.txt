@@ -1,0 +1,19 @@
+Analisando o código, o produto está bem completo para um MVP, mas ainda vejo itens que eu não lançaria sem resolver. Em ordem de prioridade:
+Bloqueadores de lançamento
+1. Credenciais reais de produção — hoje o .env não tem RESEND_API_KEY, EMAIL_FROM, MERCADO_PAGO_ACCESS_TOKEN nem MERCADO_PAGO_WEBHOOK_SECRET. Sem Resend, verificação de e-mail e recuperação de senha ficam desativadas (src/lib/auth.ts). Sem Mercado Pago, o checkout retorna 503 (src/app/api/billing/checkout/route.ts). Também troque o BETTER_AUTH_SECRET, o usuário/senha do Postgres e use URLs HTTPS.
+2. Páginas legais públicas — não existe /termos, /politica-de-privacidade nem política de cancelamento/reembolso. O Mercado Pago costuma exigir isso para aprovar a conta, e a LGPD exige base legal e transparência. Falta também checkbox de aceite no cadastro (src/components/auth-form.tsx).
+3. Direito de eliminação da conta/empresa — existe anonimização de cliente, mas não exclusão da conta do usuário nem da empresa. Isso é obrigatório na LGPD e é uma pergunta que todo cliente faz.
+4. Reconciliação de assinaturas — a ativação do plano depende 100% do webhook (src/app/api/webhooks/mercado-pago/route.ts). Se o Mercado Pago não entregar o evento, o cliente paga e não recebe o plano. Precisa de um job/cron de reconciliação consultando /preapproval ou um botão "sincronizar assinatura".
+5. Rodar o teste de concorrência de estoque — ele existe, mas nunca rodou por falta de permissão CREATEDB. Integridade de estoque é o coração do produto; valide em banco de teste antes de abrir.
+6. E2E e CI dos fluxos críticos — os 5 testes atuais cobrem só páginas públicas. Falta testar cadastro → empresa → pedido → loja pública → webhook → ativação de plano, e rodar typecheck/lint/test/build em CI (não há .github/workflows).
+Importantes para operar
+ 7. Notificações transacionais — não há e-mail/WhatsApp de "novo pedido" para o lojista nem confirmação para o cliente. Sem isso o SaaS perde muito valor no dia a dia.
+ 8. Observabilidade e operação — não há Sentry/logs estruturados, healthcheck, error.tsx, alertas, backup testado nem runbook de deploy/migração.
+ 9. Segurança — falta CSP no next.config.ts, 2FA para PLATFORM_ADMIN, revisão de dependências e rate limit além do público. O painel admin confia só em platformRole lido do banco (ok), mas 2FA é recomendável.
+10. Regras comerciais — hoje PAST_DUE bloqueia o acesso imediatamente e o cancelamento revoga na hora (src/lib/plan-rules.ts). Normalmente se mantém acesso até o fim do período pago e se dá um período de carência. Também não há trial real nem downgrade self-service para o plano free.
+Ajustes técnicos menores
+- Limites dos planos estão duplicados em prisma/seed.ts e src/app/api/company/route.ts; centralize para evitar divergência.
+- trustedOrigins usa só NEXT_PUBLIC_APP_URL; garanta que BETTER_AUTH_URL seja igual em produção.
+- Falta robots.txt, sitemap.xml, OG image, 404/500 customizados e página de suporte/contato.
+Sugestão de ordem: credenciais + páginas legais + exclusão de conta → reconciliação de cobrança + teste de concorrência + CI/E2E → notificações + observabilidade.
+Quer que eu comece implementando algum desses blocos? Eu sugeriria começar pelas páginas legais + aceite no cadastro + exclusão de conta, ou pela reconciliação de assinaturas.

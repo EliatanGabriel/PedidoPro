@@ -1,0 +1,473 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PlatformRole {
+  USER
+  PLATFORM_ADMIN
+}
+
+enum CompanyRole {
+  OWNER
+  MANAGER
+  EMPLOYEE
+}
+
+enum OrderStatus {
+  NEW
+  AWAITING_PAYMENT
+  PAYMENT_APPROVED
+  PREPARING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  REFUNDED
+  CANCELED
+}
+
+enum FulfillmentType {
+  PICKUP
+  DELIVERY
+}
+
+enum DeliveryStatus {
+  AWAITING_PICKUP
+  PREPARING
+  READY_FOR_PICKUP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum StockMovementType {
+  PURCHASE
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum PrivacyRequestType {
+  ACCESS
+  CORRECTION
+  ANONYMIZATION
+  OTHER
+}
+
+enum PrivacyRequestStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  DECLINED
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  email         String          @unique
+  emailVerified Boolean         @default(false)
+  image         String?
+  platformRole  PlatformRole    @default(USER)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  memberships   CompanyMember[]
+  auditLogs     AuditLog[]
+  expensesCreated Expense[]
+  privacyRequestsCreated PrivacyRequest[] @relation("PrivacyRequestCreatedBy")
+  privacyRequestsProcessed PrivacyRequest[] @relation("PrivacyRequestProcessedBy")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model Account {
+  id                    String   @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@index([identifier])
+}
+
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+  @@index([lastRequest])
+}
+
+model Company {
+  id               String          @id @default(cuid())
+  name             String
+  slug             String          @unique
+  description      String?
+  logoUrl          String?
+  phone            String?
+  email            String?
+  businessHours    String?
+  deliveryFeeCents Int             @default(0)
+  acceptsPickup    Boolean         @default(true)
+  acceptsDelivery  Boolean         @default(true)
+  publicPaymentMethods Json         @default("[\"PIX\",\"CASH\"]")
+  isActive         Boolean         @default(true)
+  allowNegativeStock Boolean       @default(false)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  members          CompanyMember[]
+  categories       Category[]
+  products         Product[]
+  customers        Customer[]
+  orders           Order[]
+  stockMovements   StockMovement[]
+  subscription     Subscription?
+  auditLogs        AuditLog[]
+  expenses         Expense[]
+  privacyRequests  PrivacyRequest[]
+}
+
+model CompanyMember {
+  id          String      @id @default(cuid())
+  companyId   String
+  userId      String      @unique
+  role        CompanyRole @default(EMPLOYEE)
+  permissions Json        @default("[]")
+  createdAt   DateTime    @default(now())
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([companyId, userId])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  companyId String
+  name      String
+  createdAt DateTime  @default(now())
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  products  Product[]
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model Product {
+  id           String          @id @default(cuid())
+  companyId    String
+  categoryId   String?
+  name         String
+  description  String?
+  imageUrl     String?
+  sku          String?
+  priceCents   Int
+  costCents    Int?
+  stock        Int             @default(0)
+  minStock     Int             @default(0)
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  company      Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category     Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  orderItems   OrderItem[]
+  stockHistory StockMovement[]
+  @@unique([companyId, sku])
+  @@index([companyId, isActive])
+  @@index([companyId, name])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  companyId String
+  name      String
+  phone     String?
+  email     String?
+  taxId     String?
+  address   String?
+  city      String?
+  state     String?
+  postalCode String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  orders    Order[]
+  privacyRequests PrivacyRequest[]
+  @@index([companyId, name])
+  @@index([companyId, phone])
+  @@index([companyId, email])
+  @@unique([companyId, phone])
+  @@unique([companyId, email])
+}
+
+model Order {
+  id             String          @id @default(cuid())
+  number         Int
+  companyId      String
+  customerId     String?
+  status         OrderStatus     @default(NEW)
+  paymentMethod  PaymentMethod?
+  paymentStatus  PaymentStatus   @default(PENDING)
+  fulfillment    FulfillmentType @default(PICKUP)
+  subtotalCents  Int
+  discountCents  Int             @default(0)
+  deliveryCents  Int             @default(0)
+  totalCents     Int
+  recipientName  String?
+  recipientPhone String?
+  deliveryAddress String?
+  notes          String?
+  publicToken    String          @unique @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer       Customer?       @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items          OrderItem[]
+  payments       Payment[]
+  delivery       Delivery?
+  statusHistory  OrderStatusHistory[]
+  stockMovements StockMovement[]
+  @@unique([companyId, number])
+  @@index([companyId, status, createdAt])
+  @@index([companyId, customerId])
+}
+
+model OrderItem {
+  id             String  @id @default(cuid())
+  orderId        String
+  productId      String?
+  productName    String
+  quantity       Int
+  unitPriceCents Int
+  totalCents     Int
+  unitCostCents  Int?
+  order          Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  @@index([orderId])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  orderId               String
+  amountCents           Int
+  method                PaymentMethod
+  status                PaymentStatus @default(PENDING)
+  transactionReference  String?
+  notes                 String?
+  paidAt                DateTime?
+  refundedAt            DateTime?
+  refundReference       String?
+  refundReason          String?
+  createdAt             DateTime      @default(now())
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  @@index([orderId, status])
+}
+
+model Delivery {
+  id             String         @id @default(cuid())
+  orderId        String         @unique
+  status         DeliveryStatus @default(AWAITING_PICKUP)
+  recipientName  String?
+  recipientPhone String?
+  address        String?
+  feeCents       Int            @default(0)
+  expectedAt     DateTime?
+  completedAt    DateTime?
+  notes          String?
+  order          Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model StockMovement {
+  id          String            @id @default(cuid())
+  companyId   String
+  productId   String
+  orderId     String?
+  type        StockMovementType
+  quantity    Int
+  note        String?
+  createdAt   DateTime          @default(now())
+  company     Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  product     Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order       Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  @@index([companyId, createdAt])
+  @@index([productId, createdAt])
+  @@unique([orderId, productId, type])
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  from      OrderStatus?
+  to        OrderStatus
+  actorId   String?
+  createdAt DateTime    @default(now())
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  @@index([orderId, createdAt])
+}
+
+model Plan {
+  id                String         @id @default(cuid())
+  code              String         @unique
+  name              String
+  priceCents        Int
+  monthlyOrderLimit Int
+  productLimit      Int
+  userLimit         Int
+  features          Json           @default("[]")
+  isActive          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  subscriptions     Subscription[]
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  companyId            String             @unique
+  planId               String
+  status               SubscriptionStatus @default(TRIALING)
+  trialEndsAt          DateTime?
+  currentPeriodEndsAt  DateTime?
+  provider             String?
+  providerSubscriptionId String?
+  checkoutUrl          String?
+  pendingPlanId        String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  company              Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  plan                 Plan               @relation(fields: [planId], references: [id])
+  invoices             SubscriptionInvoice[]
+}
+
+model SubscriptionInvoice {
+  id                   String       @id @default(cuid())
+  subscriptionId       String
+  providerPaymentId    String       @unique
+  amountCents          Int
+  currency             String       @default("BRL")
+  status               String
+  paidAt               DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  subscription         Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  @@index([subscriptionId, createdAt])
+}
+
+model ProviderWebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventId     String
+  eventType   String
+  processedAt DateTime @default(now())
+  @@unique([provider, eventId])
+  @@index([provider, processedAt])
+}
+
+
+model Expense {
+  id          String   @id @default(cuid())
+  companyId   String
+  createdById String?
+  description String
+  category    String
+  amountCents Int
+  occurredAt  DateTime
+  voidedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdBy   User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  @@index([companyId, occurredAt])
+  @@index([companyId, category, occurredAt])
+}
+
+model PrivacyRequest {
+  id              String                @id @default(cuid())
+  companyId       String
+  customerId      String?
+  type            PrivacyRequestType
+  status          PrivacyRequestStatus  @default(OPEN)
+  requestNote     String?
+  resolutionNote  String?
+  createdById     String?
+  processedById   String?
+  processedAt     DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  company         Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  customer        Customer?             @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  createdBy       User?                 @relation("PrivacyRequestCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  processedBy     User?                 @relation("PrivacyRequestProcessedBy", fields: [processedById], references: [id], onDelete: SetNull)
+  @@index([companyId, status, createdAt])
+  @@index([companyId, customerId, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  companyId String?
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([companyId, createdAt])
+  @@index([userId, createdAt])
+}

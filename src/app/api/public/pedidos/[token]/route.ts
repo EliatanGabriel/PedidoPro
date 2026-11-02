@@ -1,0 +1,3 @@
+import { prisma } from "@/lib/prisma";
+
+export async function GET(_request:Request,{params}:{params:Promise<{token:string}>}){const {token}=await params;const order=await prisma.order.findUnique({where:{publicToken:token},select:{number:true,status:true,paymentStatus:true,fulfillment:true,createdAt:true,updatedAt:true,company:{select:{name:true,phone:true}},items:{select:{productName:true,quantity:true,unitPriceCents:true,totalCents:true}},delivery:{select:{status:true,expectedAt:true,completedAt:true}},totalCents:true}});if(!order)return Response.json({error:"Pedido não encontrado."},{status:404});return Response.json({order});}

@@ -1,0 +1,50 @@
+{
+  "name": "pedidopro",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build --webpack",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:concurrency": "tsx scripts/test-inventory-concurrency.ts",
+    "test:e2e": "playwright test",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "admin:promote": "tsx scripts/promote-admin.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "better-auth": "^1.7.15",
+    "lucide-react": "^0.468.0",
+    "next": "^16.4.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@tailwindcss/postcss": "^4.1.16",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.4.3",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.8",
+    "tsx": "^4.20.6"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "esbuild@0.28.2": true,
+    "prisma@6.19.3": true
+  }
+}

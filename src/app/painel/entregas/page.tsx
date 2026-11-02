@@ -1,0 +1,13 @@
+import Link from "next/link";
+import { can, getTenantContext } from "@/lib/tenant";
+import { prisma } from "@/lib/prisma";
+import { money } from "@/lib/format";
+import { AccessDenied } from "@/components/access-denied";
+
+const labels: Record<string,string> = { AWAITING_PICKUP:"Aguardando retirada", PREPARING:"Em preparação", READY_FOR_PICKUP:"Pronto para retirada", IN_TRANSIT:"Em transporte", DELIVERED:"Entregue", FAILED:"Não realizada" };
+export default async function DeliveriesPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const context=await getTenantContext(); if(!context)return null; if(!can(context,"manage_deliveries"))return <AccessDenied/>;
+  const {status}=await searchParams;const valid=Object.keys(labels);const filter=status&&valid.includes(status)?status:undefined;
+  const deliveries=await prisma.delivery.findMany({where:{order:{companyId:context.company.id},...(filter?{status:filter as never}:{})},include:{order:{include:{customer:{select:{name:true}}}}},orderBy:[{expectedAt:"asc"},{order:{createdAt:"desc"}}],take:100});
+  return <div className="content"><p className="eyebrow">Operação</p><h1 className="page-title">Entregas</h1><p className="page-subtitle">Acompanhe retirada, transporte e conclusão dos pedidos.</p><div className="mt-6 flex flex-wrap gap-2">{[["Todas",""],...Object.entries(labels).map(([value,label])=>[label,value])].map(([label,value])=><Link key={value} href={value?`/painel/entregas?status=${value}`:"/painel/entregas"} className={`rounded-full border px-3 py-2 text-xs ${filter===value||(!filter&&!value)?"border-[#177a56] bg-[#edf6f1] text-[#176b4c]":"border-[#e0e7e2] bg-white text-[#68756d]"}`}>{label}</Link>)}</div><section className="card mt-4 overflow-hidden">{deliveries.length?<div className="overflow-x-auto"><table className="table"><thead><tr><th>Pedido</th><th>Destinatário</th><th>Endereço</th><th>Previsão</th><th>Status</th><th>Total</th></tr></thead><tbody>{deliveries.map(delivery=><tr key={delivery.id}><td><Link href={`/painel/pedidos/${delivery.order.id}`} className="font-semibold text-[#177a56]">#{delivery.order.number}</Link></td><td>{delivery.recipientName??delivery.order.customer?.name??"—"}</td><td>{delivery.address??"—"}</td><td>{delivery.expectedAt?new Intl.DateTimeFormat("pt-BR",{dateStyle:"short",timeStyle:"short"}).format(delivery.expectedAt):"—"}</td><td><span className="badge">{labels[delivery.status]??delivery.status}</span></td><td>{money(delivery.order.totalCents)}</td></tr>)}</tbody></table></div>:<div className="empty">Nenhuma entrega encontrada para este filtro.</div>}</section></div>;
+}

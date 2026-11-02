@@ -1,0 +1,5 @@
+import { z } from "zod";
+import { getPlatformAdmin } from "@/lib/platform-admin";
+import { prisma } from "@/lib/prisma";
+const schema=z.object({isActive:z.boolean()});
+export async function PATCH(request:Request,{params}:{params:Promise<{id:string}>}){const admin=await getPlatformAdmin();if(!admin)return Response.json({error:"Acesso restrito."},{status:403});const parsed=schema.safeParse(await request.json());if(!parsed.success)return Response.json({error:"Estado inválido."},{status:400});const {id}=await params;const company=await prisma.company.findUnique({where:{id},select:{id:true,isActive:true}});if(!company)return Response.json({error:"Empresa não encontrada."},{status:404});const updated=await prisma.$transaction(async tx=>{const row=await tx.company.update({where:{id},data:{isActive:parsed.data.isActive}});await tx.auditLog.create({data:{companyId:id,userId:admin.id,action:parsed.data.isActive?"platform.company_activated":"platform.company_blocked",entity:"Company",entityId:id,metadata:{previous:company.isActive,current:row.isActive}}});return row});return Response.json({company:updated});}

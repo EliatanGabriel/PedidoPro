@@ -1,0 +1,7 @@
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
+import { can, getTenantContext } from "@/lib/tenant";
+
+const schema=z.object({name:z.string().trim().min(2).max(60)});
+export async function GET(){const context=await getTenantContext();if(!context)return Response.json({error:"Empresa não configurada."},{status:401});if(!can(context,"view_products"))return Response.json({error:"Sem permissão para consultar categorias."},{status:403});const categories=await prisma.category.findMany({where:{companyId:context.company.id},include:{_count:{select:{products:true}}},orderBy:{name:"asc"}});return Response.json({categories});}
+export async function POST(request:Request){const context=await getTenantContext();if(!context)return Response.json({error:"Empresa não configurada."},{status:401});if(!can(context,"manage_products"))return Response.json({error:"Sem permissão para criar categorias."},{status:403});const parsed=schema.safeParse(await request.json());if(!parsed.success)return Response.json({error:"O nome precisa ter entre 2 e 60 caracteres."},{status:400});try{const category=await prisma.category.create({data:{companyId:context.company.id,name:parsed.data.name}});await prisma.auditLog.create({data:{companyId:context.company.id,userId:context.user.id,action:"category.created",entity:"Category",entityId:category.id}});return Response.json({category},{status:201});}catch{return Response.json({error:"Já existe uma categoria com esse nome."},{status:409});}}

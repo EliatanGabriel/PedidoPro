@@ -1,0 +1,7 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { apiRequest } from "@/lib/api-client";
+type Product={id:string;name:string;stock:number};
+export function StockForm({products}:{products:Product[]}){const [error,setError]=useState("");const [busy,setBusy]=useState(false);const router=useRouter();async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();const element=event.currentTarget;const form=new FormData(element);const productId=String(form.get("productId"));setBusy(true);setError("");const result=await apiRequest(`/api/products/${productId}/stock`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({delta:Number(form.get("delta")),note:form.get("note")})},"Não foi possível movimentar o estoque.");setBusy(false);if(!result.ok){setError(result.error);return;}element.reset();router.refresh();}return <form onSubmit={submit} className="grid gap-3 sm:grid-cols-[1fr_130px_1fr_auto]"><select name="productId" required className="input">{products.map(product=><option key={product.id} value={product.id}>{product.name} · {product.stock} un.</option>)}</select><input name="delta" type="number" required className="input" placeholder="+/- quantidade"/><input name="note" required minLength={3} maxLength={300} className="input" placeholder="Motivo do ajuste"/><button disabled={busy||!products.length} className="button">{busy?"Salvando…":"Movimentar"}</button>{error&&<p role="alert" className="error sm:col-span-4">{error}</p>}</form>}
