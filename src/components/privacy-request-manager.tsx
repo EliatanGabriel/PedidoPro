@@ -59,7 +59,7 @@ export function PrivacyRequestManager({ initial, customers }: { initial: Privacy
       const anonymizeResponse = await fetch(`/api/customers/${request.customer.id}/anonymize`, { method: "POST" });
       const anonymizeBody = await anonymizeResponse.json() as { error?: string };
       if (!anonymizeResponse.ok) throw new Error(anonymizeBody.error ?? "Não foi possível anonimizar os dados.");
-      const response = await fetch(`/api/privacy-requests/${request.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "COMPLETED", resolutionNote: "Dados pessoais do cadastro e do histórico de pedidos anonimizados no PedidoPro." }) });
+      const response = await fetch(`/api/privacy-requests/${request.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "COMPLETED", resolutionNote: "Dados pessoais do cadastro e do histórico de pedidos anonimizados no Ordexa." }) });
       const body = await response.json() as { error?: string };
       if (!response.ok) throw new Error(body.error ?? "Dados anonimizados, mas não foi possível concluir o registro da solicitação.");
       router.refresh();

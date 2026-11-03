@@ -31,7 +31,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return new Response(JSON.stringify(payload, null, 2), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Disposition": `attachment; filename="pedidopro-cliente-${customer.id}.json"`,
+      "Content-Disposition": `attachment; filename="ordexa-cliente-${customer.id}.json"`,
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff",
     },

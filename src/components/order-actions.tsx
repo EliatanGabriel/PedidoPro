@@ -78,7 +78,7 @@ export function PaymentForm({ id, remainingCents }: { id: string; remainingCents
     <label className="block text-xs font-semibold">Identificador da transação<input name="reference" maxLength={120} className="input mt-2" /></label>
     {error && <p role="alert" className="error">{error}</p>}
     <button disabled={busy || remainingCents <= 0} className="button w-full">{busy ? "Registrando…" : "Registrar recebimento"}</button>
-    <p className="text-[10px] leading-4 text-[#87928b]">Registro manual para conciliação. Nenhuma cobrança é processada pelo PedidoPro.</p>
+    <p className="text-[10px] leading-4 text-[#87928b]">Registro manual para conciliação. Nenhuma cobrança é processada pelo Ordexa.</p>
   </form>;
 }
 
@@ -111,6 +111,6 @@ export function RefundPaymentForm({ orderId, paymentId, amountCents }: { orderId
     <label className="block text-[11px]">Referência do estorno (opcional)<input name="reference" maxLength={120} className="input mt-1" /></label>
     {error && <p role="alert" className="error">{error}</p>}
     <button disabled={busy} className="button secondary">{busy ? "Registrando…" : "Confirmar estorno"}</button>
-    <p className="text-[10px] leading-4 text-[#748078]">Este registro atualiza o PedidoPro, mas não solicita o estorno à operadora.</p>
+    <p className="text-[10px] leading-4 text-[#748078]">Este registro atualiza o Ordexa, mas não solicita o estorno à operadora.</p>
   </form></details>;
 }

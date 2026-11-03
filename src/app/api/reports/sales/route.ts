@@ -12,5 +12,5 @@ export async function GET(request: Request) {
   const orders=await prisma.order.findMany({where:{companyId:context.company.id,createdAt:{gte:start,lte:end},status:{not:"CANCELED"}},include:{items:true,payments:{where:{status:"PAID"},select:{amountCents:true}}},orderBy:{createdAt:"asc"}});
   const rows=[["pedido","data","status","itens","receita_bruta_centavos","descontos_centavos","pagamentos_recebidos_centavos"],...orders.map((order)=>[String(order.number),order.createdAt.toISOString(),order.status,String(order.items.reduce((n,item)=>n+item.quantity,0)),String(order.subtotalCents+order.deliveryCents),String(order.discountCents),String(order.payments.reduce((sum,payment)=>sum+payment.amountCents,0))])];
   const csv="\uFEFF"+rows.map((row)=>row.map(csvCell).join(",")).join("\r\n");
-  return new Response(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":"attachment; filename=pedidopro-vendas.csv","Cache-Control":"private, no-store"}});
+  return new Response(csv,{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":"attachment; filename=ordexa-vendas.csv","Cache-Control":"private, no-store"}});
 }

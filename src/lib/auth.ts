@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "production" && (!secret || secret.length < 32)) {
 }
 
 export const auth = betterAuth({
-  appName: "PedidoPro",
+  appName: "Ordexa",
   baseURL: process.env.BETTER_AUTH_URL,
   secret,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -28,7 +28,7 @@ export const auth = betterAuth({
     minPasswordLength: 10,
     ...(authEmailConfigured ? {
       requireEmailVerification: true,
-      sendResetPassword: ({ user, url }: { user: { email: string }; url: string }) => scheduleAuthEmail({ to: user.email, subject: "Redefina sua senha do PedidoPro", intro: "Recebemos uma solicitação para redefinir a senha da sua conta.", actionLabel: "Criar nova senha", actionUrl: url }),
+      sendResetPassword: ({ user, url }: { user: { email: string }; url: string }) => scheduleAuthEmail({ to: user.email, subject: "Redefina sua senha do Ordexa", intro: "Recebemos uma solicitação para redefinir a senha da sua conta.", actionLabel: "Criar nova senha", actionUrl: url }),
       resetPasswordTokenExpiresIn: 60 * 60,
     } : {}),
   },
@@ -36,7 +36,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     expiresIn: 60 * 60,
-    sendVerificationEmail: ({ user, url }: { user: { email: string }; url: string }) => scheduleAuthEmail({ to: user.email, subject: "Confirme seu e-mail do PedidoPro", intro: "Confirme que este endereço de e-mail pertence a você.", actionLabel: "Confirmar e-mail", actionUrl: url }),
+    sendVerificationEmail: ({ user, url }: { user: { email: string }; url: string }) => scheduleAuthEmail({ to: user.email, subject: "Confirme seu e-mail do Ordexa", intro: "Confirme que este endereço de e-mail pertence a você.", actionLabel: "Confirmar e-mail", actionUrl: url }),
   } : undefined,
   rateLimit: { enabled: true, window: 60, max: 30, storage: "database", customRules: { "/sign-in/email": { window: 60, max: 5 }, "/sign-up/email": { window: 60, max: 3 }, "/request-password-reset": { window: 60, max: 3 }, "/send-verification-email": { window: 60, max: 3 } } },
   user: { additionalFields: { platformRole: { type: "string", required: false, defaultValue: "USER", input: false } } },

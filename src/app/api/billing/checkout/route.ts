@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: { "X-Idempotency-Key": `${context.company.id}-${plan.id}-${Math.floor(Date.now() / 60_000)}` },
       body: JSON.stringify({
-        reason: `PedidoPro ${plan.name}`,
+        reason: `Ordexa ${plan.name}`,
         external_reference: `${context.company.id}:${plan.id}`,
         payer_email: context.user.email,
         auto_recurring: { frequency: 1, frequency_type: "months", transaction_amount: plan.priceCents / 100, currency_id: "BRL" },

@@ -8,7 +8,7 @@ export function ThemeToggle() {
     const next = root.dataset.theme === "dark" ? "light" : "dark";
     root.dataset.theme = next;
     try {
-      window.localStorage.setItem("pedidopro-theme", next);
+      window.localStorage.setItem("ordexa-theme", next);
     } catch {
       return;
     }

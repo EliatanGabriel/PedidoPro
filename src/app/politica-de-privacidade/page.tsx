@@ -6,7 +6,7 @@ export default function PoliticaPrivacidadePage() {
 
         <p className="text-[#4a5568] mb-4">
           A sua privacidade é importante para nós. Esta Política de Privacidade descreve como
-          coletamos, usamos e protegemos as suas informações quando você usa o PedidoPro.
+          coletamos, usamos e protegemos as suas informações quando você usa o Ordexa.
         </p>
 
         <h2 className="text-xl font-semibold text-[#177a56] mt-6">1. Informações que Coletamos</h2>
@@ -48,7 +48,7 @@ export default function PoliticaPrivacidadePage() {
           <li>Com provedores de serviço que nos ajudam a operar o serviço, sujeitos a
             acordos de confidencialidade.</li>
           <li>Quando exigido por lei ou em resposta a solicitações governamentais válidas.</li>
-          <li>Para proteger os direitos, propriedade ou segurança do PedidoPro, nossos usuários
+          <li>Para proteger os direitos, propriedade ou segurança do Ordexa, nossos usuários
             ou o público.</li>
           <li>No contexto de uma fusão, aquisição ou venda de ativos, onde as informações
             pessoais podem ser transferidas como parte dos ativos transferidos.</li>

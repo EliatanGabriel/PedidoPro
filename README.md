@@ -1,6 +1,6 @@
-# PedidoPro
+# Ordexa
 
-Aplicação SaaS multiempresa para gestão de pedidos, clientes e estoque. Inclui painel comercial e administrativo, autenticação com e-mail via Resend configurável, loja pública e checkout recorrente do PedidoPro via Mercado Pago (ativado somente com credenciais válidas).
+Aplicação SaaS multiempresa para gestão de pedidos, clientes e estoque. Inclui painel comercial e administrativo, autenticação com e-mail via Resend configurável, loja pública e checkout recorrente do Ordexa via Mercado Pago (ativado somente com credenciais válidas).
 
 ## Requisitos
 

@@ -74,7 +74,7 @@ export function TeamManager({ initial }: { initial: Member[] }) {
 
   return <div className="space-y-5">
     <form onSubmit={add} className="space-y-4">
-      <label className="block text-xs font-semibold">E-mail da conta PedidoPro
+      <label className="block text-xs font-semibold">E-mail da conta Ordexa
         <input name="email" type="email" required className="input mt-2" placeholder="pessoa@empresa.com" />
       </label>
       <fieldset>
@@ -87,7 +87,7 @@ export function TeamManager({ initial }: { initial: Member[] }) {
       </fieldset>
       {error && <p role="alert" className="error">{error}</p>}
       <button disabled={busy} className="button">{busy ? "Salvando…" : "Adicionar ou atualizar acesso"}</button>
-      <p className="text-[10px] text-[#87928b]">A pessoa precisa ter uma conta PedidoPro. O sistema não envia convite por e-mail nesta versão.</p>
+      <p className="text-[10px] text-[#87928b]">A pessoa precisa ter uma conta Ordexa. O sistema não envia convite por e-mail nesta versão.</p>
     </form>
 
     <div className="border-t border-[#edf0ed] pt-4">

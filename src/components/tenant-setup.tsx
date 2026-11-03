@@ -17,7 +17,7 @@ export function TenantSetup() {
   }
   return <form onSubmit={submit} className="card mx-auto mt-8 max-w-lg space-y-5 p-6">
     <label className="block text-sm font-medium">Nome da empresa<input name="name" required minLength={2} maxLength={80} className="input mt-2" placeholder="Ateliê da Ana" /></label>
-    <label className="block text-sm font-medium">Endereço público da loja<div className="mt-2 flex items-center gap-2"><span className="text-xs text-[#748078]">pedidopro.com.br/loja/</span><input name="slug" required minLength={3} maxLength={40} className="input" placeholder="atelie-da-ana" /></div></label>
+    <label className="block text-sm font-medium">Endereço público da loja<div className="mt-2 flex items-center gap-2"><span className="text-xs text-[#748078]">ordexa.com.br/loja/</span><input name="slug" required minLength={3} maxLength={40} className="input" placeholder="atelie-da-ana" /></div></label>
     {error && <p role="alert" className="error">{error}</p>}
     <button disabled={busy} className="button">{busy ? "Criando empresa…" : "Criar minha empresa"}</button>
   </form>;
