@@ -429,6 +429,7 @@ model Expense {
   amountCents Int
   occurredAt  DateTime
   voidedAt    DateTime?
+  notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)

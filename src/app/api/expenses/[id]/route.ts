@@ -4,7 +4,7 @@ import { can, getTenantContext } from "@/lib/tenant";
 import { hasPlanFeature } from "@/lib/plans";
 
 const categories = ["RENT", "SUPPLIERS", "MARKETING", "SERVICES", "TAXES", "TRANSPORT", "OTHER"] as const;
-const schema = z.object({ description: z.string().trim().min(3).max(160), category: z.enum(categories), amountCents: z.number().int().positive().max(2_147_483_647), occurredAt: z.iso.datetime() });
+const schema = z.object({ description: z.string().trim().min(3).max(160), category: z.enum(categories), amountCents: z.number().int().positive().max(2_147_483_647), occurredAt: z.iso.datetime(), notes: z.string().trim().max(500).optional().nullable() });
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const context = await getTenantContext();
