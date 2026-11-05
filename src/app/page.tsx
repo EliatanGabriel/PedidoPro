@@ -55,7 +55,7 @@ export default function HomePage() {
       <nav className="fixed z-40 top-0 left-0 right-0 px-6 py-4">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <Logo className="ml-1" width={26} height={15} />
+            <Logo className="ml-1" width={40} height={22} />
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-[#66736b] font-medium">
             <Link href="#recursos" className="hover:text-[#177a56] transition">
@@ -175,7 +175,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold text-[#19372b] lg:text-4xl">
               Tudo o que o seu negócio precisa
             </h2>
-            <p className="mt-4 text-[#718078] leading-relaxed">
+            <p className="mt-4 text-[#718078] leading-relaxed max-w-2xl mx-auto">
               Recursos pensados para rotinas de venda pequenas, mas com a
               organização de uma operação grande.
             </p>
@@ -184,16 +184,17 @@ export default function HomePage() {
             {features.map((feature, i) => (
               <div
                 key={feature.title}
-                className="rounded-xl border border-[#e5ebe6] bg-white p-6 hover:border-[#177a56]/50 transition animate-fade-in-up"
-                style={{ animationDelay: `${100 + i * 100}ms` }}
+                className={`rounded-xl border border-[#e5ebe6] bg-white p-6 hover:border-[#177a56]/50 transition animate-fade-in-up ${i === 0 ? "delay-100" : i === 1 ? "delay-200" : i === 2 ? "delay-300" : "delay-400"}`}
               >
-                <div className="rounded-lg bg-[#edf6f1] p-3 text-[#177a56] mb-4 inline-flex">
+                <div className="rounded-lg bg-[#edf6f1] p-3 text-[#177a56] inline-flex mb-4">
                   <feature.icon size={20} />
                 </div>
-                <h3 className="text-sm font-semibold text-[#19372b] mb-2">
+                <h3 className="text-sm font-semibold text-[#19372b] mb-2 leading-tight">
                   {feature.title}
                 </h3>
-                <p className="text-xs text-[#718078] leading-5">{feature.desc}</p>
+                <p className="text-xs text-[#718078] leading-5 line-clamp-3">
+                  {feature.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -234,27 +235,100 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-24 px-6">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-[#e5ece7] bg-[#163d2e] p-8 md:p-12 text-center animate-fade-in-up">
-          <h2 className="text-3xl font-bold text-white lg:text-4xl">
-            Pronto para organizar seu negócio?
-          </h2>
-          <p className="mt-4 text-[#b7d8c7] leading-relaxed">
-            Comece no plano gratuito. Sem cartão de crédito, sem compromisso.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/cadastro"
-              className="button flex-1 sm:w-auto px-8 py-3 text-base"
+      <section id="precos" className="py-24 px-6 bg-white">
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl font-bold text-[#19372b] lg:text-4xl">
+              Escolha o plano ideal
+            </h2>
+            <p className="mt-4 text-[#718078] leading-relaxed">
+              Comece grátis e evolua quando precisar de mais recursos.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div
+              className={`rounded-2xl border border-[#e5ebe6] bg-white p-8 animate-fade-in-up delay-100 relative`}
             >
-              Criar conta grátis
-            </Link>
-            <Link
-              href="/login"
-              className="button secondary flex-1 sm:w-auto px-8 py-3 text-base border border-white/30 text-white"
+              <div className="flex flex-col items-center text-center">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#edf6f1] px-2 py-1 text-xs font-bold text-[#177a56] mb-4">
+                  Plano inicial
+                </span>
+                <h3 className="text-xl font-bold text-[#19372b]">Gratuito</h3>
+                <p className="mt-1 text-4xl font-bold text-[#177a56]">R$ 0</p>
+                <p className="text-xs text-[#718078] mt-1">por mês</p>
+              </div>
+              <ul className="mt-8 space-y-4 text-sm text-[#718078]">
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Até 300 pedidos/mês
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Até 200 produtos
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Até 3 usuários
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Relatórios
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Controle de despesas
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Controle de estoque
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Loja pública
+                </li>
+              </ul>
+              <div className="mt-10">
+                <Link
+                  href="/cadastro"
+                  className="button w-full py-3"
+                >
+                  Começar grátis
+                </Link>
+              </div>
+            </div>
+            <div
+              className={`rounded-2xl border-2 border-[#177a56] bg-[#edf6f1] p-8 animate-fade-in-up delay-200 relative`}
             >
-              Já tenho conta
-            </Link>
+              <div className="absolute top-4 right-4 rounded-full bg-[#177a56] px-2 py-1 text-xs font-bold text-white">
+                Mais vendido
+              </div>
+              <div className="flex flex-col items-center text-center">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#177a56] px-2 py-1 text-xs font-bold text-white mb-4">
+                  Plano Pro
+                </span>
+                <h3 className="text-xl font-bold text-[#19372b]">Pro</h3>
+                <p className="mt-1 text-4xl font-bold text-[#177a56]">R$ 29,90</p>
+                <p className="text-xs text-[#718078] mt-1">por mês</p>
+              </div>
+              <ul className="mt-8 space-y-4 text-sm text-[#718078]">
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Tudo do plano Gratuito
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Pedidos ilimitados
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Produtos ilimitados
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Até 10 usuários
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-[#177a56]">✓</span> Relatórios avançados
+                </li>
+              </ul>
+              <div className="mt-10">
+                <Link
+                  href="/cadastro"
+                  className="button w-full py-3 bg-[#177a56] hover:bg-[#156c48]"
+                >
+                  Escolher Pro
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
