@@ -28,8 +28,12 @@ export function AuthForm({ mode, emailVerificationRequired = false }: { mode: "l
       }
       if (mode === "signup" && emailVerificationRequired) {
         router.push(`/verificar-email?email=${encodeURIComponent(payload.email)}`);
+      } else if (mode === "login") {
+        const session = await authClient.getSession();
+        const platformRole = (session.data?.user as { platformRole?: string } | undefined)?.platformRole;
+        router.push(platformRole === "PLATFORM_ADMIN" ? "/admin" : "/painel");
       } else {
-        router.push(mode === "signup" ? "/configurar-empresa" : "/painel");
+        router.push("/configurar-empresa");
       }
       router.refresh();
     } catch {

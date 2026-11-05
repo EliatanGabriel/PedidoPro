@@ -19,7 +19,8 @@
     "db:backup": "bash scripts/backup-db.sh",
     "env:check": "tsx scripts/check-env.ts",
     "env:check:strict": "tsx scripts/check-env.ts --strict",
-    "admin:promote": "tsx scripts/promote-admin.ts"
+    "admin:promote": "tsx scripts/promote-admin.ts",
+    "admin:bootstrap": "tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

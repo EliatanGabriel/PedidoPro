@@ -5,6 +5,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "@/lib/prisma";
 import { authEmailConfigured, sendAuthEmail } from "@/lib/email";
 import { logger } from "@/lib/logger";
+import { ensureBootstrapAdmin } from "@/lib/admin-bootstrap";
 
 const secret = process.env.BETTER_AUTH_SECRET;
 async function scheduleAuthEmail(message: Parameters<typeof sendAuthEmail>[0]): Promise<void> {
@@ -93,6 +94,18 @@ export const auth = betterAuth({
   user: {
     additionalFields: { platformRole: { type: "string", required: false, defaultValue: "USER", input: false } },
     deleteUser: { enabled: true, beforeDelete, afterDelete },
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        after: async (session) => {
+          const userId = (session as { userId?: string }).userId;
+          if (!userId) return;
+          const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true, email: true, platformRole: true } });
+          if (user) await ensureBootstrapAdmin(user);
+        },
+      },
+    },
   },
   trustedOrigins: process.env.NEXT_PUBLIC_APP_URL ? [process.env.NEXT_PUBLIC_APP_URL] : undefined,
 });
