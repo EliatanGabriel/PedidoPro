@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, CreditCard, LayoutDashboard, Package, ScrollText, Users } from "lucide-react";
+import { Activity, Building2, CreditCard, LayoutDashboard, Package, ScrollText, Users } from "lucide-react";
 import { getPlatformAdmin } from "@/lib/platform-admin";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,6 +14,7 @@ const nav = [
   { href: "/admin/usuarios", label: "Usuários", icon: Users },
   { href: "/admin/assinaturas", label: "Assinaturas", icon: CreditCard },
   { href: "/admin/planos", label: "Planos", icon: Package },
+  { href: "/admin/operacoes", label: "Operações", icon: Activity },
   { href: "/admin/auditoria", label: "Auditoria", icon: ScrollText },
 ];
 
