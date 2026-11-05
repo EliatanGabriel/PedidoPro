@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { can, getTenantContext } from "@/lib/tenant";
@@ -5,6 +6,9 @@ import { calculateOrderTotals } from "@/lib/order-rules";
 import { subscriptionIsActive } from "@/lib/plans";
 import { brazilStartOfMonth } from "@/lib/format";
 import { reserveStock } from "@/lib/inventory";
+import { enqueueNewOrderNotification, ownerEmailForCompany } from "@/lib/notifications";
+import { processEmailOutbox } from "@/lib/email-outbox";
+import { logger } from "@/lib/logger";
 
 const orderSchema = z.object({ customerId: z.string().cuid().optional(), recipientName: z.string().trim().max(120).optional(), recipientPhone: z.string().trim().max(30).optional(), paymentMethod: z.enum(["PIX", "CASH", "CREDIT_CARD", "DEBIT_CARD", "BANK_TRANSFER", "OTHER"]).optional(), fulfillment: z.enum(["PICKUP", "DELIVERY"]).default("PICKUP"), discountCents: z.number().int().nonnegative().max(2_147_483_647).default(0), deliveryCents: z.number().int().nonnegative().max(2_147_483_647).default(0), deliveryAddress: z.string().trim().max(300).optional(), notes: z.string().trim().max(1000).optional(), items: z.array(z.object({ productId: z.string().cuid(), quantity: z.number().int().positive().max(999) })).min(1).max(50) });
 
@@ -67,8 +71,20 @@ export async function POST(request: Request) {
       }, include: { items: true, customer: true } });
       for (const [productId, quantity] of quantities) await tx.stockMovement.create({ data: { companyId: context.company.id, productId, orderId: created.id, type: "SALE", quantity: -quantity, note: `Pedido #${number}` } });
       await tx.auditLog.create({ data: { companyId: context.company.id, userId: context.user.id, action: "order.created", entity: "Order", entityId: created.id, metadata: { number, totalCents } } });
+      const ownerEmail = await ownerEmailForCompany(tx, context.company.id);
+      await enqueueNewOrderNotification(tx, {
+        companyId: context.company.id,
+        merchantEmail: context.company.email || ownerEmail,
+        companyName: context.company.name,
+        orderNumber: number,
+        customerName: created.customer?.name ?? data.recipientName ?? null,
+        itemCount: created.items.reduce((sum, item) => sum + item.quantity, 0),
+        totalCents,
+        orderId: created.id,
+      });
       return created;
     }, { isolationLevel: "Serializable" });
+    after(() => processEmailOutbox(10).catch((error) => logger.error("email.outbox_processing_failed", error)));
     return Response.json({ order }, { status: 201 });
   } catch (error) {
     const reason = error instanceof Error ? error.message : "";

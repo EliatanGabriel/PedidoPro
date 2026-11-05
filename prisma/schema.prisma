@@ -183,6 +183,7 @@ model Company {
   auditLogs        AuditLog[]
   expenses         Expense[]
   privacyRequests  PrivacyRequest[]
+  emailOutbox      EmailOutbox[]
 }
 
 model CompanyMember {
@@ -470,4 +471,28 @@ model AuditLog {
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   @@index([companyId, createdAt])
   @@index([userId, createdAt])
+}
+
+enum EmailOutboxStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+model EmailOutbox {
+  id            String            @id @default(cuid())
+  companyId     String?
+  to            String
+  subject       String
+  text          String
+  html          String
+  status        EmailOutboxStatus @default(PENDING)
+  attempts      Int               @default(0)
+  lastError     String?
+  nextAttemptAt DateTime          @default(now())
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  company       Company?          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@index([status, nextAttemptAt])
+  @@index([companyId])
 }

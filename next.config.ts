@@ -13,9 +13,12 @@ const nextConfig: NextConfig = {
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         {
           key: "Content-Security-Policy",
-          value: `default-src 'self'; script-src 'self' ${process.env.NODE_ENV !== "production" ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none';`,
+          value: `default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; script-src 'self' ${process.env.NODE_ENV !== "production" ? "'unsafe-eval' 'unsafe-inline'" : "'unsafe-inline'"}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none';${process.env.NODE_ENV === "production" ? " upgrade-insecure-requests;" : ""}`,
         },
-        ...(process.env.NODE_ENV === "production" ? [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" }] : []),
+        ...(process.env.NODE_ENV === "production" ? [
+          { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains; preload" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+        ] : []),
       ],
     }];
   },

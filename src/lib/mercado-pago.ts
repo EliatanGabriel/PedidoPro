@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { logger } from "@/lib/logger";
 
 const API = "https://api.mercadopago.com";
 export const mercadoPagoConfigured = Boolean(process.env.MERCADO_PAGO_ACCESS_TOKEN && process.env.MERCADO_PAGO_WEBHOOK_SECRET);
@@ -27,7 +28,7 @@ export async function mercadoPagoRequest<T>(path: string, init?: RequestInit): P
   });
   if (!response.ok) {
     const body = await response.text();
-    console.error("Mercado Pago API error", response.status, body.slice(0, 500));
+    logger.error("billing.provider_error", undefined, { status: response.status, body: body.slice(0, 500) });
     throw new Error("Falha ao consultar o provedor de cobrança.");
   }
   return response.json() as Promise<T>;

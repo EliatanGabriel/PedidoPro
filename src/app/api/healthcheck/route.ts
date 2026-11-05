@@ -1,36 +1,34 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { authEmailConfigured } from "@/lib/email";
+import { mercadoPagoConfigured } from "@/lib/mercado-pago";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const startedAt = Date.now();
+  let database: { status: "ok" | "error"; latencyMs?: number } = { status: "error" };
   try {
-    // Verificações básicas de saúde
-    const healthChecks = {
-      database: "checking",
-      storage: "checking",
-    };
-
-    // Em um ambiente de produção, aqui haveria verificações reais:
-    // - Conexão com banco de dados
-    // - Disponibilidade de serviços externos
-    // - Espaço em disco
-    // - Memória disponível
-
-    // Simulando verificação bem-sucedida
-    healthChecks.database = "ok";
-    healthChecks.storage = "ok";
-
-    return NextResponse.json({
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      version: "1.0.0",
-      checks: healthChecks,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: "unhealthy",
-        error: error instanceof Error ? error.message : "Erro desconhecido",
-      },
-      { status: 503 }
-    );
+    await prisma.$queryRaw`SELECT 1`;
+    database = { status: "ok", latencyMs: Date.now() - startedAt };
+  } catch {
+    database = { status: "error" };
   }
+
+  const healthy = database.status === "ok";
+  return NextResponse.json(
+    {
+      status: healthy ? "healthy" : "unhealthy",
+      timestamp: new Date().toISOString(),
+      uptimeSeconds: Math.round(process.uptime()),
+      checks: {
+        database,
+        integrations: {
+          email: authEmailConfigured ? "configured" : "disabled",
+          billing: mercadoPagoConfigured ? "configured" : "disabled",
+        },
+      },
+    },
+    { status: healthy ? 200 : 503, headers: { "Cache-Control": "no-store" } },
+  );
 }

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { mercadoPagoRequest, validMercadoPagoSignature } from "@/lib/mercado-pago";
+import { logger } from "@/lib/logger";
 
 const identifierSchema = z.union([z.string().trim().min(1).max(100), z.number().int().nonnegative()]);
 const noticeSchema = z.object({
@@ -104,7 +105,7 @@ export async function POST(request: Request) {
     return Response.json({ received: true });
   } catch (error) {
     if (typeof error === "object" && error !== null && "code" in error && (error as { code?: string }).code === "P2002") return Response.json({ received: true, duplicate: true });
-    console.error("Mercado Pago webhook could not be processed.", error);
+    logger.error("billing.webhook_failed", error, { eventId, eventType });
     return Response.json({ error: "Notificação não processada." }, { status: 502 });
   }
 }

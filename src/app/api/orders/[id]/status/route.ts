@@ -1,7 +1,11 @@
+import { after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { can, getTenantContext } from "@/lib/tenant";
 import { canTransitionOrder, type OrderState } from "@/lib/order-rules";
+import { enqueueOrderStatusNotification } from "@/lib/notifications";
+import { processEmailOutbox } from "@/lib/email-outbox";
+import { logger } from "@/lib/logger";
 
 const schema = z.object({ status: z.enum(["AWAITING_PAYMENT", "PAYMENT_APPROVED", "PREPARING", "READY_FOR_PICKUP", "OUT_FOR_DELIVERY", "COMPLETED", "CANCELED"]) });
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +17,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const { id } = await params;
   try {
     const order = await prisma.$transaction(async (tx) => {
-      const current = await tx.order.findFirst({ where: { id, companyId: context.company.id }, include: { items: true, delivery: true } });
+      const current = await tx.order.findFirst({ where: { id, companyId: context.company.id }, include: { items: true, delivery: true, customer: { select: { email: true, name: true } }, company: { select: { name: true } } } });
       if (!current) throw new Error("ORDER_NOT_FOUND");
       if (!canTransitionOrder(current.status as OrderState, parsed.data.status as OrderState)) throw new Error("INVALID_TRANSITION");
       if (parsed.data.status === "CANCELED") {
@@ -30,8 +34,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       if (current.delivery && nextDeliveryStatus) await tx.delivery.update({ where: { id: current.delivery.id }, data: { status: nextDeliveryStatus, ...(nextDeliveryStatus === "DELIVERED" ? { completedAt: new Date() } : {}) } });
       await tx.orderStatusHistory.create({ data: { orderId: current.id, from: current.status, to: parsed.data.status, actorId: context.user.id } });
       await tx.auditLog.create({ data: { companyId: context.company.id, userId: context.user.id, action: "order.status_changed", entity: "Order", entityId: current.id, metadata: { from: current.status, to: parsed.data.status } } });
+      await enqueueOrderStatusNotification(tx, {
+        companyId: context.company.id,
+        customerEmail: current.customer?.email ?? null,
+        companyName: current.company.name,
+        orderNumber: current.number,
+        status: parsed.data.status,
+        publicToken: current.publicToken,
+      });
       return updated;
     }, { isolationLevel: "Serializable" });
+    after(() => processEmailOutbox(10).catch((error) => logger.error("email.outbox_processing_failed", error)));
     return Response.json({ order });
   } catch (error) {
     const reason = error instanceof Error ? error.message : "";

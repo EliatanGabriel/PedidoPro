@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { calculateOrderTotals } from "@/lib/order-rules";
@@ -6,6 +7,9 @@ import { allowPublicOrder } from "@/lib/rate-limit";
 import { brazilStartOfMonth } from "@/lib/format";
 import { subscriptionIsActive } from "@/lib/plans";
 import { reserveStock } from "@/lib/inventory";
+import { enqueueNewOrderNotification, ownerEmailForCompany } from "@/lib/notifications";
+import { processEmailOutbox } from "@/lib/email-outbox";
+import { logger } from "@/lib/logger";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -84,8 +88,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
       });
       for (const [productId, quantity] of quantities) await tx.stockMovement.create({ data: { companyId: company.id, productId, orderId: created.id, type: "SALE", quantity: -quantity, note: `Pedido público #${number}` } });
       await tx.auditLog.create({ data: { companyId: company.id, action: "public_order.created", entity: "Order", entityId: created.id, metadata: { number, totalCents: totals.totalCents } } });
+      const ownerEmail = await ownerEmailForCompany(tx, company.id);
+      await enqueueNewOrderNotification(tx, {
+        companyId: company.id,
+        merchantEmail: company.email || ownerEmail,
+        companyName: company.name,
+        orderNumber: number,
+        customerName: data.name,
+        itemCount: data.items.reduce((sum, item) => sum + item.quantity, 0),
+        totalCents: totals.totalCents,
+        orderId: created.id,
+      });
       return created;
     }, { isolationLevel: "Serializable" });
+    after(() => processEmailOutbox(10).catch((error) => logger.error("email.outbox_processing_failed", error)));
     return Response.json({ order: { number: order.number, publicToken: order.publicToken, totalCents: order.totalCents } }, { status: 201 });
   } catch (error) {
     const reason = error instanceof Error ? error.message : "";

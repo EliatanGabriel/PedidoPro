@@ -33,4 +33,9 @@ describe("API request origin proxy", () => {
     const webhook = proxy(new NextRequest("https://app.example/api/webhooks/mercado-pago", { method: "POST" }));
     expect(webhook.headers.get("x-middleware-next")).toBe("1");
   });
+
+  it("leaves the cron endpoint to its bearer token check", () => {
+    const cron = proxy(new NextRequest("https://app.example/api/cron/email-outbox", { method: "POST" }));
+    expect(cron.headers.get("x-middleware-next")).toBe("1");
+  });
 });

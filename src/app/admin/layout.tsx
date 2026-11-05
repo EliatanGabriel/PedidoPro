@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Building2, CreditCard, LayoutDashboard, Package, ScrollText, Users } from "lucide-react";
 import { getPlatformAdmin } from "@/lib/platform-admin";
 import { SignOutButton } from "@/components/sign-out-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 const nav = [
   { href: "/admin", label: "Visão geral", icon: LayoutDashboard },

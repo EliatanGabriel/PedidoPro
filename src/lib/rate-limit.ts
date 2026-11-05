@@ -1,9 +1,9 @@
 import { createHash, randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { clientIp } from "@/lib/client-ip";
 
 export async function allowPublicOrder(request: Request, slug: string) {
-  const forwarded = request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const fingerprint = createHash("sha256").update(forwarded).digest("hex");
+  const fingerprint = createHash("sha256").update(clientIp(request.headers)).digest("hex");
   const key = `public-order:${slug}:${fingerprint}`;
   const now = BigInt(Date.now());
   const cutoff = now - BigInt(60_000);

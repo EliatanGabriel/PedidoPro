@@ -1,7 +1,10 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTenantContext } from "@/lib/tenant";
 import { Sidebar } from "@/components/sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function PanelLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const context = await getTenantContext();
