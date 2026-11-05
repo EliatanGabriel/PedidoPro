@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { subscriptionIsActive } from "@/lib/plan-rules";
 export { subscriptionIsActive } from "@/lib/plan-rules";
 
-export type PlanFeature = "reports" | "advanced_reports" | "expenses" | "stock" | "public_store";
+export type PlanFeature = "dashboard_basic" | "orders" | "reports" | "advanced_reports" | "expenses" | "stock" | "public_store";
 
 export async function hasPlanFeature(companyId: string, feature: PlanFeature) {
   const subscription = await prisma.subscription.findUnique({ where: { companyId }, include: { plan: true } });

@@ -15,9 +15,8 @@ export async function POST(request: Request) {
     const company = await prisma.$transaction(async (tx) => {
       const created = await tx.company.create({ data: parsed.data });
       const planDefinitions = [
-        { code: "free", name: "Gratuito", priceCents: 0, monthlyOrderLimit: 30, productLimit: 20, userLimit: 1, features: ["dashboard_basic", "orders"] },
-        { code: "professional", name: "Profissional", priceCents: 2990, monthlyOrderLimit: 300, productLimit: 200, userLimit: 3, features: ["reports", "expenses", "stock", "public_store"] },
-        { code: "business", name: "Empresarial", priceCents: 5990, monthlyOrderLimit: 0, productLimit: 0, userLimit: 10, features: ["reports", "advanced_reports", "expenses", "stock", "public_store"] },
+        { code: "free", name: "Gratuito", priceCents: 0, monthlyOrderLimit: 300, productLimit: 200, userLimit: 3, features: ["dashboard_basic", "orders", "reports", "expenses", "stock", "public_store"] },
+        { code: "pro", name: "Pro", priceCents: 2990, monthlyOrderLimit: 0, productLimit: 0, userLimit: 10, features: ["dashboard_basic", "orders", "reports", "advanced_reports", "expenses", "stock", "public_store"] },
       ];
       const plans = await Promise.all(planDefinitions.map((definition) => tx.plan.upsert({ where: { code: definition.code }, update: {}, create: definition })));
       const plan = plans.find((item) => item.code === "free")!;
