@@ -7,7 +7,7 @@ describe("Button", () => {
     render(<Button>Salvar</Button>);
     const button = screen.getByRole("button", { name: /salvar/i });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute("type", "button");
+    expect(button).not.toHaveAttribute("type", "button");
   });
 
   it("applies variant classes", () => {

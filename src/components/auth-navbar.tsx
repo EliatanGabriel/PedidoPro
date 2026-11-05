@@ -3,10 +3,10 @@ import { Logo } from "@/components/logo";
 
 export function AuthNavbar() {
   return (
-    <nav className="fixed z-40 top-0 left-0 right-0 px-6 py-4">
-      <div className="mx-auto max-w-6xl flex items-center justify-between px-6 py-4">
+    <nav className="fixed z-40 top-0 left-0 right-0 px-6 py-4 border-b border-[#e5ebe6] bg-white/95 backdrop-blur">
+      <div className="mx-auto max-w-6xl flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Logo className="ml-1" width={24} height={13} />
+          <Logo width={36} height={20} />
         </div>
         <div className="hidden md:flex items-center gap-6 text-sm text-[#66736b] font-medium">
           <Link href="/" className="hover:text-[#177a56] transition">
