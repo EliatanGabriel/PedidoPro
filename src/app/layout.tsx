@@ -4,6 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Ordexa — Gestão de pedidos",
   description: "Pedidos, estoque e clientes em um só lugar.",
+  metadataBase: new URL("https://pedidopro.onrender.com"),
   manifest: "/site.webmanifest",
   icons: [
     { rel: "icon", type: "image/x-icon", url: "/favicon.ico" },
@@ -17,7 +18,6 @@ export const metadata: Metadata = {
     title: "Ordexa — Gestão de pedidos",
     description: "Pedidos, estoque e clientes em um só lugar.",
     type: "website",
-    url: "https://ordexa.com.br",
     images: [{ url: "/android-chrome-512x512.png", width: 512, height: 512, alt: "Logotipo Ordexa" }],
     siteName: "Ordexa",
     locale: "pt_BR",
