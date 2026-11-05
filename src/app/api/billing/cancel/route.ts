@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getTenantContext } from "@/lib/tenant";
-import { caktoRequest } from "@/lib/mercado-pago";
+import { caktoRequest } from "@/lib/cakto";
 
 export async function POST() {
   const context = await getTenantContext();
