@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Button, Input } from "@/components/ui";
 
 export function AuthForm({ mode, emailVerificationRequired = false }: { mode: "login" | "signup"; emailVerificationRequired?: boolean }) {
   const [error, setError] = useState("");
@@ -43,7 +44,7 @@ export function AuthForm({ mode, emailVerificationRequired = false }: { mode: "l
     }
   }
   return <form onSubmit={submit} className="space-y-4">
-    {mode === "signup" && <label className="block text-sm font-medium">Seu nome<input name="name" autoComplete="name" required minLength={2} className="input mt-2" placeholder="Ana Souza" /></label>}
+    {mode === "signup" && <label className="block text-sm font-medium">Seu nome<Input name="name" autoComplete="name" required minLength={2} className="mt-2" placeholder="Ana Souza" /></label>}
     {mode === "signup" && (
       <label className="flex items-start items-baseline space-x-2">
         <input
@@ -58,9 +59,9 @@ export function AuthForm({ mode, emailVerificationRequired = false }: { mode: "l
         </span>
       </label>
     )}
-    <label className="block text-sm font-medium">E-mail<input name="email" type="email" autoComplete="email" required className="input mt-2" placeholder="voce@empresa.com" /></label>
-    <label className="block text-sm font-medium">Senha<input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={10} className="input mt-2" placeholder="Mínimo de 10 caracteres" /></label>
+    <label className="block text-sm font-medium">E-mail<Input name="email" type="email" autoComplete="email" required className="mt-2" placeholder="voce@empresa.com" /></label>
+    <label className="block text-sm font-medium">Senha<Input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={10} className="mt-2" placeholder="Mínimo de 10 caracteres" /></label>
     {error && <p role="alert" className="error">{error}</p>}
-    <button disabled={busy} className="button w-full !py-3">{busy ? "Aguarde…" : mode === "login" ? "Entrar na conta" : "Criar conta"}</button>
+    <Button disabled={busy} className="w-full !py-3">{busy ? "Aguarde…" : mode === "login" ? "Entrar na conta" : "Criar conta"}</Button>
   </form>;
 }

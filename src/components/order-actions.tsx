@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { orderStatusLabel } from "@/lib/format";
 import { apiRequest } from "@/lib/api-client";
+import { Button, Input, Select, Textarea } from "@/components/ui";
 
 const nextOrderStatus: Record<string, string[]> = {
   NEW: ["AWAITING_PAYMENT", "PAYMENT_APPROVED", "PREPARING", "CANCELED"],
@@ -39,10 +40,10 @@ export function OrderStatusForm({ id, status }: { id: string; status: string }) 
 
   const options = nextOrderStatus[status] ?? [];
   return <form onSubmit={update} className="flex flex-wrap items-center gap-2">
-    <select name="status" aria-label="Novo status do pedido" className="input !w-auto" disabled={busy || options.length === 0}>
+    <Select name="status" aria-label="Novo status do pedido" className="!w-auto" disabled={busy || options.length === 0}>
       {options.map((value) => <option key={value} value={value}>{orderStatusLabel(value)}</option>)}
-    </select>
-    <button className="button secondary" disabled={busy || options.length === 0}>{busy ? "Atualizando…" : "Atualizar status"}</button>
+    </Select>
+    <Button variant="secondary" disabled={busy || options.length === 0}>{busy ? "Atualizando…" : "Atualizar status"}</Button>
     {error && <span role="alert" className="text-xs text-red-700">{error}</span>}
   </form>;
 }
@@ -73,11 +74,11 @@ export function PaymentForm({ id, remainingCents }: { id: string; remainingCents
   }
 
   return <form onSubmit={submit} className="space-y-3">
-    <label className="block text-xs font-semibold">Valor recebido (R$)<input name="amount" type="number" min="0.01" max={remainingCents / 100} step="0.01" required className="input mt-2" /></label>
-    <label className="block text-xs font-semibold">Forma de pagamento<select name="method" required className="input mt-2"><option value="PIX">PIX</option><option value="CASH">Dinheiro</option><option value="CREDIT_CARD">Cartão de crédito</option><option value="DEBIT_CARD">Cartão de débito</option><option value="BANK_TRANSFER">Transferência</option><option value="OTHER">Outro</option></select></label>
-    <label className="block text-xs font-semibold">Identificador da transação<input name="reference" maxLength={120} className="input mt-2" /></label>
+    <div className="block text-xs font-semibold">Valor recebido (R$)<Input name="amount" type="number" min="0.01" max={remainingCents / 100} step="0.01" required className="mt-2" /></div>
+    <div className="block text-xs font-semibold">Forma de pagamento<Select name="method" required className="mt-2"><option value="PIX">PIX</option><option value="CASH">Dinheiro</option><option value="CREDIT_CARD">Cartão de crédito</option><option value="DEBIT_CARD">Cartão de débito</option><option value="BANK_TRANSFER">Transferência</option><option value="OTHER">Outro</option></Select></div>
+    <div className="block text-xs font-semibold">Identificador da transação<Input name="reference" maxLength={120} className="mt-2" /></div>
     {error && <p role="alert" className="error">{error}</p>}
-    <button disabled={busy || remainingCents <= 0} className="button w-full">{busy ? "Registrando…" : "Registrar recebimento"}</button>
+    <Button disabled={busy || remainingCents <= 0} className="w-full">{busy ? "Registrando…" : "Registrar recebimento"}</Button>
     <p className="text-[10px] leading-4 text-[#87928b]">Registro manual para conciliação. Nenhuma cobrança é processada pelo Ordexa.</p>
   </form>;
 }
@@ -107,10 +108,10 @@ export function RefundPaymentForm({ orderId, paymentId, amountCents }: { orderId
   }
 
   return <details className="mt-2"><summary className="cursor-pointer text-[11px] font-semibold text-red-700">Registrar estorno manual</summary><form onSubmit={submit} className="mt-2 space-y-2">
-    <label className="block text-[11px]">Motivo<textarea name="reason" required minLength={3} maxLength={500} rows={2} className="input mt-1" /></label>
-    <label className="block text-[11px]">Referência do estorno (opcional)<input name="reference" maxLength={120} className="input mt-1" /></label>
+    <div className="block text-[11px]">Motivo<Textarea name="reason" required minLength={3} maxLength={500} rows={2} className="mt-1" /></div>
+    <div className="block text-[11px]">Referência do estorno (opcional)<Input name="reference" maxLength={120} className="mt-1" /></div>
     {error && <p role="alert" className="error">{error}</p>}
-    <button disabled={busy} className="button secondary">{busy ? "Registrando…" : "Confirmar estorno"}</button>
+    <Button variant="secondary" disabled={busy}>{busy ? "Registrando…" : "Confirmar estorno"}</Button>
     <p className="text-[10px] leading-4 text-[#748078]">Este registro atualiza o Ordexa, mas não solicita o estorno à operadora.</p>
   </form></details>;
 }

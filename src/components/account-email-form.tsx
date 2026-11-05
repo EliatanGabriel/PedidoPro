@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { Button, Input } from "@/components/ui";
 
 export function AccountEmailForm({ mode, enabled, initialEmail = "" }: { mode: "recovery" | "verification"; enabled: boolean; initialEmail?: string }) {
   const [email, setEmail] = useState(initialEmail);
@@ -41,10 +42,10 @@ export function AccountEmailForm({ mode, enabled, initialEmail = "" }: { mode: "
   return <div>
     {!enabled && <p className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-900">O serviço de e-mail ainda não está configurado. A recuperação e a confirmação de contas estão indisponíveis.</p>}
     <form onSubmit={submit} className="mt-5 space-y-4">
-      <label className="block text-sm font-medium">E-mail<input name="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="input mt-2" placeholder="voce@empresa.com" /></label>
+      <label className="block text-sm font-medium">E-mail<Input name="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="mt-2" placeholder="voce@empresa.com" /></label>
       {error && <p role="alert" className="error">{error}</p>}
       {message && <p role="status" className="rounded-lg bg-[#edf6f1] p-3 text-xs leading-5 text-[#176b4c]">{message}</p>}
-      <button disabled={busy || !enabled} className="button w-full">{busy ? "Enviando…" : isRecovery ? "Enviar instruções" : "Reenviar confirmação"}</button>
+      <Button disabled={busy || !enabled}>{busy ? "Enviando…" : isRecovery ? "Enviar instruções" : "Reenviar confirmação"}</Button>
     </form>
     <p className="mt-5 text-center text-sm text-[#748078]"><Link className="font-semibold text-[#177a56]" href="/login">Voltar para entrar</Link></p>
   </div>;
@@ -77,10 +78,10 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
   }
 
   return <div><form onSubmit={submit} className="mt-5 space-y-4">
-    <label className="block text-sm font-medium">Nova senha<input name="password" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="input mt-2" /></label>
-    <label className="block text-sm font-medium">Confirme a nova senha<input name="confirmation" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="input mt-2" /></label>
+    <label className="block text-sm font-medium">Nova senha<Input name="password" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="mt-2" /></label>
+    <label className="block text-sm font-medium">Confirme a nova senha<Input name="confirmation" type="password" minLength={10} maxLength={128} autoComplete="new-password" required className="mt-2" /></label>
     {error && <p role="alert" className="error">{error}</p>}
     {message && <p role="status" className="rounded-lg bg-[#edf6f1] p-3 text-xs leading-5 text-[#176b4c]">{message} <Link className="font-semibold underline" href="/login">Entrar</Link></p>}
-    <button disabled={busy || !token} className="button w-full">{busy ? "Atualizando…" : "Redefinir senha"}</button>
+    <Button disabled={busy || !token}>{busy ? "Atualizando…" : "Redefinir senha"}</Button>
   </form><p className="mt-5 text-center text-sm text-[#748078]"><Link className="font-semibold text-[#177a56]" href="/login">Voltar para entrar</Link></p></div>;
 }

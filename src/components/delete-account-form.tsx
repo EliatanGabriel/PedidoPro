@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { Button, Input } from "@/components/ui";
 
 export function DeleteAccountForm({ blockedReason }: { blockedReason: string | null }) {
   const [confirmation, setConfirmation] = useState("");
@@ -44,15 +45,13 @@ export function DeleteAccountForm({ blockedReason }: { blockedReason: string | n
   return <form onSubmit={submit} className="space-y-4">
     <label className="block text-xs font-semibold">
       Confirme sua senha
-      <input name="password" type="password" autoComplete="current-password" required minLength={10} value={password} onChange={(event) => setPassword(event.target.value)} className="input mt-2" />
+      <Input name="password" type="password" autoComplete="current-password" required minLength={10} value={password} onChange={(event) => setPassword(event.target.value)} className="mt-2" />
     </label>
     <label className="block text-xs font-semibold">
       Digite <strong>EXCLUIR</strong> para confirmar
-      <input name="confirmation" required value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="input mt-2" placeholder="EXCLUIR" />
+      <Input name="confirmation" required value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="mt-2" placeholder="EXCLUIR" />
     </label>
     {error && <p role="alert" className="error">{error}</p>}
-    <button disabled={busy} className="button !bg-red-700 hover:!bg-red-800">
-      {busy ? "Excluindo…" : "Excluir minha conta"}
-    </button>
+    <Button disabled={busy} variant="destructive">{busy ? "Excluindo…" : "Excluir minha conta"}</Button>
   </form>;
 }

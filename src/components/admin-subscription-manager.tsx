@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { Input, Select } from "@/components/ui";
 
 type Plan = { id: string; name: string; isActive: boolean };
 type Subscription = { id: string; companyName: string; companySlug: string; planId: string; status: string; trialEndsAt: string | null; currentPeriodEndsAt: string | null };
@@ -52,10 +53,10 @@ export function AdminSubscriptionManager({ subscription, plans }: { subscription
           <button type="button" onClick={() => setOpen(false)} aria-label="Fechar" className="rounded p-1 text-[#748078] hover:bg-[#f0f4f1]"><X size={18}/></button>
         </div>
         <form onSubmit={submit} className="mt-4 grid gap-3">
-          <label className="text-xs">Plano<select name="planId" defaultValue={subscription.planId} className="input mt-1">{plans.filter((plan) => plan.isActive).map((plan) => <option key={plan.id} value={plan.id}>{plan.name}</option>)}</select></label>
-          <label className="text-xs">Status<select name="status" defaultValue={subscription.status} className="input mt-1"><option value="TRIALING">Em avaliação</option><option value="ACTIVE">Ativa</option><option value="PAST_DUE">Em atraso</option><option value="CANCELED">Cancelada</option></select></label>
-          <label className="text-xs">Fim da avaliação<input type="datetime-local" name="trialEndsAt" defaultValue={localInput(subscription.trialEndsAt)} className="input mt-1"/></label>
-          <label className="text-xs">Fim do período atual<input type="datetime-local" name="currentPeriodEndsAt" defaultValue={localInput(subscription.currentPeriodEndsAt)} className="input mt-1"/></label>
+          <label className="text-xs">Plano<Select name="planId" defaultValue={subscription.planId} className="mt-1">{plans.filter((plan) => plan.isActive).map((plan) => <option key={plan.id} value={plan.id}>{plan.name}</option>)}</Select></label>
+          <label className="text-xs">Status<Select name="status" defaultValue={subscription.status} className="mt-1"><option value="TRIALING">Em avaliação</option><option value="ACTIVE">Ativa</option><option value="PAST_DUE">Em atraso</option><option value="CANCELED">Cancelada</option></Select></label>
+          <label className="text-xs">Fim da avaliação<Input type="datetime-local" name="trialEndsAt" defaultValue={localInput(subscription.trialEndsAt)} className="mt-1"/></label>
+          <label className="text-xs">Fim do período atual<Input type="datetime-local" name="currentPeriodEndsAt" defaultValue={localInput(subscription.currentPeriodEndsAt)} className="mt-1"/></label>
           {error && <p role="alert" className="error">{error}</p>}
           {saved && <p role="status" className="text-xs text-[#177a56]">Assinatura atualizada.</p>}
           <div className="flex flex-wrap justify-end gap-2 pt-1"><button type="button" onClick={() => setOpen(false)} className="button secondary">Fechar</button><button disabled={busy} className="button">{busy ? "Salvando…" : "Salvar alterações"}</button></div>
