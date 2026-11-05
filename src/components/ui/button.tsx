@@ -22,6 +22,7 @@ export function Button({
   const sizes = { sm: "h-8 px-3", default: "h-10 px-4 py-2", lg: "h-11 px-8" };
   return (
     <button
+      type="button"
       className={`${base} ${variants[variant]} ${sizes[size]} ${className ?? ""}`}
       {...props}
     />

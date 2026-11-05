@@ -3,5 +3,9 @@ import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-  test: { environment: "node", include: ["src/**/*.test.ts"] },
+  test: {
+    environment: "jsdom",
+    include: ["src/**/*.{test.ts,test.tsx}"],
+    setupFiles: ["./vitest.setup.ts"],
+  },
 });

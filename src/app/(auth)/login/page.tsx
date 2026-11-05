@@ -1,8 +1,60 @@
 import { authEmailConfigured } from "@/lib/email";
 import Link from "next/link";
 import { AuthForm } from "@/components/auth-form";
-import { Logo } from "@/components/logo";
+import { AuthNavbar } from "@/components/auth-navbar";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Entrar — Ordexa", description: "Acesse sua conta Ordexa para acompanhar pedidos, estoque e clientes." };
 
 export default function LoginPage() {
-  return <main className="min-h-screen grid md:grid-cols-2 bg-white"><div className="hidden md:flex flex-col justify-between bg-[#163d2e] p-12 text-white"><Logo className="mb-4" width={36} height={20}/><div><p className="text-sm uppercase tracking-[.18em] text-[#a4cbb7]">Sua operação, mais leve</p><h1 className="mt-4 max-w-lg text-4xl font-semibold leading-tight">Pedidos organizados. Clientes bem atendidos. Negócio em movimento.</h1></div><p className="text-xs text-[#a4cbb7]">Ordexa · Gestão simples para quem vende todos os dias.</p></div><div className="flex items-center justify-center px-6 py-12"><div className="w-full max-w-sm"><p className="text-xs font-semibold uppercase tracking-widest text-[#177a56]">Acesse sua conta</p><h2 className="mt-3 text-3xl font-bold tracking-tight">Bem-vindo de volta</h2><p className="mt-2 text-sm text-[#748078]">Entre para acompanhar sua operação.</p><div className="mt-8"><AuthForm mode="login" emailVerificationRequired={authEmailConfigured} /></div><div className="mt-5 flex justify-center gap-4 text-xs"><Link href="/recuperar-senha" className="font-semibold text-[#177a56]">Esqueci minha senha</Link>{authEmailConfigured&&<Link href="/verificar-email" className="font-semibold text-[#177a56]">Reenviar confirmação</Link>}</div><p className="mt-6 text-center text-sm text-[#748078]">Ainda não tem conta? <Link className="font-semibold text-[#177a56]" href="/cadastro">Crie sua conta</Link></p></div></div></main>;
+  return (
+    <main className="min-h-screen grid md:grid-cols-2 bg-white pt-16">
+      <AuthNavbar />
+      <div className="hidden md:flex flex-col justify-between bg-[#163d2e] p-12 text-white">
+        <div className="flex flex-col gap-6">
+          <p className="text-sm uppercase tracking-[.18em] text-[#a4cbb7]">
+            Sua operação, mais leve
+          </p>
+          <h1 className="mt-2 max-w-lg text-4xl font-semibold leading-tight">
+            Pedidos organizados. Clientes bem atendidos. Negócio em movimento.
+          </h1>
+        </div>
+        <p className="text-xs text-[#a4cbb7] mt-auto">
+          Ordexa · Gestão simples para quem vende todos os dias.
+        </p>
+      </div>
+      <div className="flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#177a56]">
+            Acesse sua conta
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">
+            Bem-vindo de volta
+          </h2>
+          <p className="mt-2 text-sm text-[#748078]">
+            Entre para acompanhar sua operação.
+          </p>
+          <div className="mt-8">
+            <AuthForm mode="login" emailVerificationRequired={authEmailConfigured} />
+          </div>
+          <div className="mt-5 flex justify-center gap-4 text-xs">
+            <Link href="/recuperar-senha" className="font-semibold text-[#177a56]">
+              Esqueci minha senha
+            </Link>
+            {authEmailConfigured && (
+              <Link href="/verificar-email" className="font-semibold text-[#177a56]">
+                Reenviar confirmação
+              </Link>
+            )}
+          </div>
+          <p className="mt-6 text-center text-sm text-[#748078]">
+            Ainda não tem conta?{" "}
+            <Link className="font-semibold text-[#177a56]" href="/cadastro">
+              Crie sua conta
+            </Link>
+          </p>
+        </div>
+      </div>
+    </main>
+  );
 }

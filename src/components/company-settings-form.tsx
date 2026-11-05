@@ -11,6 +11,8 @@ export function CompanySettingsForm({ initial }: { initial: Settings }) {
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState(initial.logoUrl ?? null);
   const router = useRouter();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -34,11 +36,34 @@ export function CompanySettingsForm({ initial }: { initial: Settings }) {
     }
   }
 
+  async function uploadLogo(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setUploading(true); setError("");
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const response = await fetch("/api/upload", { method: "POST", body: form });
+      const body = await response.json();
+      if (!response.ok) { setError(body.error ?? "Não foi possível enviar a imagem."); return; }
+      setLogoPreview(body.logoUrl);
+      const formEl = event.currentTarget.form;
+      if (formEl) {
+        const input = formEl.elements.namedItem("logoUrl") as HTMLInputElement | null;
+        if (input) input.value = body.logoUrl;
+      }
+    } catch {
+      setError("Falha de conexão ao enviar a imagem.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return <form onSubmit={submit} className="space-y-5">
     <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-semibold">Nome comercial<Input name="name" defaultValue={initial.name} required maxLength={80} className="mt-2"/></label><label className="text-xs font-semibold">Telefone<Input name="phone" defaultValue={initial.phone??""} maxLength={30} className="mt-2"/></label></div>
     <label className="block text-xs font-semibold">Identificador da loja<Input name="slug" defaultValue={initial.slug} required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={40} className="mt-2"/><span className="mt-1 block font-normal text-[#87928b]">Endereço público: /loja/{initial.slug}</span></label>
     <label className="block text-xs font-semibold">Descrição<Textarea name="description" defaultValue={initial.description??""} maxLength={1000} rows={3} className="mt-2"/></label>
-    <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-semibold">E-mail comercial<Input name="email" type="email" defaultValue={initial.email??""} className="mt-2"/></label><label className="text-xs font-semibold">Logotipo (URL)<Input name="logoUrl" type="url" defaultValue={initial.logoUrl??""} placeholder="https://…" className="mt-2"/></label></div>
+    <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-semibold">E-mail comercial<Input name="email" type="email" defaultValue={initial.email??""} className="mt-2"/></label><div className="flex flex-col"><label className="text-xs font-semibold">Logotipo</label><div className="mt-2 flex items-center gap-3"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadLogo} disabled={uploading} className="block text-xs text-[#4b5850]"/>{logoPreview && (<><img src={logoPreview} alt="Pré-visualização" className="h-16 w-16 rounded object-cover border border-[#dfe7e1]"/><button type="button" onClick={() => { setLogoPreview(null); const inputs = document.querySelectorAll('input[name="logoUrl"]'); inputs.forEach((input)=>(input as HTMLInputElement).value="") }} className="text-xs text-red-700">Remover</button></>)}</div><Input name="logoUrl" type="url" defaultValue={initial.logoUrl??""} placeholder="https://…" className="mt-2"/><p className="mt-1 text-[10px] text-[#87928b]">Envie uma imagem (PNG, JPG, WEBP, até 2 MB) ou cole uma URL externa.</p></div></div>
     <label className="block text-xs font-semibold">Horário de funcionamento<Textarea name="businessHours" defaultValue={initial.businessHours??""} maxLength={500} rows={3} className="mt-2" placeholder="Segunda a sexta: 9h às 18h&#10;Sábado: 9h às 13h"/><span className="mt-1 block font-normal text-[#87928b]">Esse texto será exibido na página pública.</span></label>
     <section className="rounded-lg border border-[#e6ece7] p-4"><h2 className="text-sm font-semibold">Pedidos públicos</h2><div className="mt-3 grid gap-3 sm:grid-cols-2"><label className="flex items-center gap-2 text-xs"><input name="acceptsPickup" type="checkbox" defaultChecked={initial.acceptsPickup}/>Aceita retirada</label><label className="flex items-center gap-2 text-xs"><input name="acceptsDelivery" type="checkbox" defaultChecked={initial.acceptsDelivery}/>Aceita entrega</label><label className="text-xs font-semibold">Taxa de entrega (R$)<Input name="deliveryFee" type="number" min="0" step="0.01" defaultValue={(initial.deliveryFeeCents/100).toFixed(2)} className="mt-2"/></label></div><fieldset className="mt-4"><legend className="text-xs font-semibold">Formas de pagamento informadas ao cliente</legend><div className="mt-2 grid gap-2 sm:grid-cols-2">{methods.map(([value,label])=><label key={value} className="flex items-center gap-2 text-xs"><input name={`payment-${value}`} type="checkbox" defaultChecked={initial.publicPaymentMethods.includes(value)}/>{label}</label>)}</div></fieldset></section>
     <label className="flex items-start gap-3 rounded-lg bg-[#fff9e9] p-3 text-xs"><input name="allowNegativeStock" type="checkbox" defaultChecked={initial.allowNegativeStock} className="mt-0.5"/><span><strong>Permitir estoque negativo</strong><span className="mt-1 block font-normal text-[#748078]">Ative somente se sua operação vende sob encomenda. A alteração será registrada na auditoria.</span></span></label>

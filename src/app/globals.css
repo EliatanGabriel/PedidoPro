@@ -165,3 +165,17 @@ html[data-theme="dark"] .shell [class~="from-[#edf6f1]"] { --tw-gradient-from:#1
 html[data-theme="dark"] .shell [class~="to-white"] { --tw-gradient-to:#161e1a; }
 
 @media (max-width:760px) { .sidebar { width:68px; padding:18px 7px; } .brand { padding:7px 8px 26px; font-size:0; } .brand:after { content:"P"; font-size:21px; } .brand span,.nav-label,.nav-link span,.sidebar-bottom .nav-link span { display:none; } .nav-link { justify-content:center; padding:12px 8px; } .topbar { padding:0 18px; height:62px; } .content { padding:24px 16px 40px; } .page-title { font-size:22px; } .table th,.table td { padding:11px 10px; } }
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideInRight { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+.animate-fade-in { animation:fadeIn .7s ease-out both; }
+.animate-fade-in-up { animation:fadeInUp .8s ease-out both; }
+.animate-slide-in-right { animation:slideInRight .7s ease-out both; }
+.delay-100 { animation-delay:100ms; }
+.delay-200 { animation-delay:200ms; }
+.delay-300 { animation-delay:300ms; }
+.delay-400 { animation-delay:400ms; }
+.delay-500 { animation-delay:500ms; }
+.delay-600 { animation-delay:600ms; }
+.delay-700 { animation-delay:700ms; }

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PublicStore } from "@/components/public-store";
 import { hasPlanFeature } from "@/lib/plans";
+import type { Metadata } from "next";
 
 export default async function PublicStorePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -18,4 +19,15 @@ export default async function PublicStorePage({ params }: { params: Promise<{ sl
   const publicPaymentMethods = Array.isArray(company.publicPaymentMethods) ? company.publicPaymentMethods.filter((method): method is string => typeof method === "string") : [];
   if (publicPaymentMethods.length === 0 || (!company.acceptsDelivery && !company.acceptsPickup)) notFound();
   return <PublicStore slug={slug} company={{ name: company.name, description: company.description, phone: company.phone, email: company.email, logoUrl: company.logoUrl, businessHours: company.businessHours, deliveryFeeCents: company.deliveryFeeCents, acceptsPickup: company.acceptsPickup, acceptsDelivery: company.acceptsDelivery, publicPaymentMethods, allowNegativeStock: company.allowNegativeStock }} products={products}/>;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const company = await prisma.company.findUnique({ where: { slug, isActive: true }, select: { name: true, description: true, logoUrl: true } });
+  if (!company) return { title: "Loja não encontrada" };
+  return {
+    title: company.name,
+    description: company.description ?? undefined,
+    openGraph: { title: company.name, type: "website", description: company.description ?? undefined, images: company.logoUrl ? [{ url: company.logoUrl }] : [] },
+  };
 }

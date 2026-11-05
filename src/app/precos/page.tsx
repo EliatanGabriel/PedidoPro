@@ -2,8 +2,15 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { money } from "@/lib/format";
 import { Logo } from "@/components/logo";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Preços — Ordexa",
+  description: "Planos da Ordexa: gestão de pedidos, estoque e clientes. Plano gratuito para começar, assinaturas pagas com checkout recorrente.",
+  openGraph: { title: "Preços — Ordexa", type: "website", description: "Escolha o plano ideal para o seu negócio.", images: [{ url: "/android-chrome-512x512.png", width: 512, height: 512 }] },
+};
 
 const featureLabels: Record<string, string> = {
   dashboard_basic: "Dashboard básico", orders: "Gestão de pedidos", reports: "Relatórios comerciais",
