@@ -15,11 +15,11 @@ export default async function AccountPage() {
   });
 
   const memberCount = company?.members.length ?? 1;
-  const hasActiveProviderSubscription = company?.subscription?.provider === "MERCADO_PAGO" && company.subscription.status === "ACTIVE";
+  const hasActiveProviderSubscription = company?.subscription?.provider === "CAKTO" && company.subscription.status === "ACTIVE";
   const blockedReason = context.membership.role === "OWNER" && memberCount > 1
     ? "Sua conta é proprietária de uma empresa com outras pessoas na equipe. Remova os demais membros em Equipe antes de excluir a conta."
     : hasActiveProviderSubscription
-      ? "Existe uma assinatura ativa no Mercado Pago. Cancele a assinatura antes de excluir a conta."
+      ? "Existe uma assinatura ativa na Cakto. Cancele a assinatura antes de excluir a conta."
       : null;
 
   return <div className="content">

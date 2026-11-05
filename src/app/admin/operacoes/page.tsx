@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { dateTime } from "@/lib/format";
 import { authEmailConfigured } from "@/lib/email";
-import { mercadoPagoConfigured } from "@/lib/mercado-pago";
+import { caktoConfigured } from "@/lib/cakto";
 import { AdminEmailRetry } from "@/components/admin-email-retry";
 
 export const dynamic = "force-dynamic";
@@ -90,7 +90,7 @@ export default async function AdminOperationsPage() {
           <div className="mt-4 space-y-3 text-xs">
             <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">Banco de dados</span><span className={database.ok ? "font-semibold text-[#177a56]" : "font-semibold text-red-700"}>{database.ok ? `OK · ${database.latency} ms` : "Indisponível"}</span></div>
             <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">E-mail transacional</span><span className={authEmailConfigured ? "font-semibold text-[#177a56]" : "font-semibold text-red-700"}>{authEmailConfigured ? "Configurado" : "Desativado"}</span></div>
-            <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">Cobrança Mercado Pago</span><span className={mercadoPagoConfigured ? "font-semibold text-[#177a56]" : "font-semibold text-red-700"}>{mercadoPagoConfigured ? "Configurada" : "Desativada"}</span></div>
+            <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">Cobrança Cakto</span><span className={caktoConfigured ? "font-semibold text-[#177a56]" : "font-semibold text-red-700"}>{caktoConfigured ? "Configurada" : "Desativada"}</span></div>
             <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">Solicitações LGPD abertas</span><span className="font-semibold">{countFor(privacyCounts, "OPEN")}</span></div>
             <div className="flex items-center justify-between gap-3"><span className="text-[#748078]">Em andamento</span><span className="font-semibold">{countFor(privacyCounts, "IN_PROGRESS")}</span></div>
           </div>

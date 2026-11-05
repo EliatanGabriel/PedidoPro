@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { isMercadoPagoCheckoutUrl } from "@/lib/mercado-pago-url";
+import { isCaktoCheckoutUrl } from "@/lib/mercado-pago-url";
 
 type PlanOption = { id: string; name: string; priceCents: number };
 
@@ -17,7 +17,7 @@ export function SubscriptionCheckout({ plans, configured, canCancel }: { plans: 
     try {
       const response = await fetch("/api/billing/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ planId }) });
       const result = await response.json() as { checkoutUrl?: string; error?: string };
-      if (!response.ok || !result.checkoutUrl || !isMercadoPagoCheckoutUrl(result.checkoutUrl)) throw new Error(result.error ?? "Checkout do provedor inválido.");
+      if (!response.ok || !result.checkoutUrl || !isCaktoCheckoutUrl(result.checkoutUrl)) throw new Error(result.error ?? "Checkout do provedor inválido.");
       window.location.assign(result.checkoutUrl);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Não foi possível abrir o checkout.");
@@ -40,5 +40,5 @@ export function SubscriptionCheckout({ plans, configured, canCancel }: { plans: 
     }
   }
 
-  return <div className="mt-6 border-t border-[#e9eeea] pt-5"><h3 className="font-semibold">Mudar de plano</h3><p className="mt-1 text-xs text-[#748078]">O plano só muda após confirmação do Mercado Pago.</p>{plans.length > 0 && <div className="mt-3 grid gap-2 sm:grid-cols-2">{plans.map((plan) => <button key={plan.id} type="button" disabled={!configured || loading !== null} onClick={() => checkout(plan.id)} className="button secondary flex items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:opacity-50"><span>{loading === plan.id ? "Abrindo checkout…" : plan.name}</span><span>R$ {(plan.priceCents / 100).toFixed(2).replace(".", ",")}/mês</span></button>)}</div>}{canCancel && <button type="button" className="mt-4 text-xs text-red-700 underline disabled:opacity-50" disabled={loading !== null} onClick={cancelSubscription}>{loading === "cancel" ? "Cancelando…" : "Cancelar assinatura recorrente"}</button>}{!configured && <p className="mt-3 text-xs text-amber-800">Checkout indisponível até configurar o acesso e o webhook do Mercado Pago.</p>}{error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}</div>;
+  return <div className="mt-6 border-t border-[#e9eeea] pt-5"><h3 className="font-semibold">Mudar de plano</h3><p className="mt-1 text-xs text-[#748078]">O plano só muda após confirmação do Mercado Pago.</p>{plans.length > 0 && <div className="mt-3 grid gap-2 sm:grid-cols-2">{plans.map((plan) => <button key={plan.id} type="button" disabled={!configured || loading !== null} onClick={() => checkout(plan.id)} className="button secondary flex items-center justify-between gap-3 text-left disabled:cursor-not-allowed disabled:opacity-50"><span>{loading === plan.id ? "Abrindo checkout…" : plan.name}</span><span>R$ {(plan.priceCents / 100).toFixed(2).replace(".", ",")}/mês</span></button>)}</div>}{canCancel && <button type="button" className="mt-4 text-xs text-red-700 underline disabled:opacity-50" disabled={loading !== null} onClick={cancelSubscription}>{loading === "cancel" ? "Cancelando…" : "Cancelar assinatura recorrente"}</button>}{!configured && <p className="mt-3 text-xs text-amber-800">Checkout indisponível até configurar o acesso e o webhook da Cakto.</p>}{error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}</div>;
 }

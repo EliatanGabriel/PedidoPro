@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authEmailConfigured } from "@/lib/email";
-import { mercadoPagoConfigured } from "@/lib/mercado-pago";
+import { caktoConfigured } from "@/lib/cakto";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export async function GET() {
         database,
         integrations: {
           email: authEmailConfigured ? "configured" : "disabled",
-          billing: mercadoPagoConfigured ? "configured" : "disabled",
+          billing: caktoConfigured ? "configured" : "disabled",
         },
       },
     },

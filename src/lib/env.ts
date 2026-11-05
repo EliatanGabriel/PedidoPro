@@ -78,13 +78,21 @@ export function inspectEnv(env: Env = process.env): EnvIssue[] {
     });
   }
 
-  const hasMercadoPagoToken = Boolean(env.MERCADO_PAGO_ACCESS_TOKEN);
-  const hasMercadoPagoSecret = Boolean(env.MERCADO_PAGO_WEBHOOK_SECRET);
-  if (hasMercadoPagoToken !== hasMercadoPagoSecret) {
+  const hasCaktoClientId = Boolean(env.CAKTO_CLIENT_ID);
+  const hasCaktoClientSecret = Boolean(env.CAKTO_CLIENT_SECRET);
+  const hasCaktoWebhookSecret = Boolean(env.CAKTO_WEBHOOK_SECRET);
+  if (hasCaktoClientId !== hasCaktoClientSecret) {
     issues.push({
-      key: "MERCADO_PAGO_ACCESS_TOKEN",
+      key: "CAKTO_CLIENT_ID",
       severity: "warning",
-      message: "Configure MERCADO_PAGO_ACCESS_TOKEN e MERCADO_PAGO_WEBHOOK_SECRET juntos.",
+      message: "Configure CAKTO_CLIENT_ID e CAKTO_CLIENT_SECRET juntos.",
+    });
+  }
+  if (hasCaktoClientId && !hasCaktoWebhookSecret) {
+    issues.push({
+      key: "CAKTO_WEBHOOK_SECRET",
+      severity: "warning",
+      message: "Configure CAKTO_WEBHOOK_SECRET para receber eventos do webhook da Cakto.",
     });
   }
 

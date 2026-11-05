@@ -40,7 +40,7 @@ async function beforeDelete(user: { id: string }, request?: Request) {
     if (membership.company.members.length > 1) {
       throw new APIError("BAD_REQUEST", { message: "Remova os demais membros da equipe antes de excluir a conta." });
     }
-    if (membership.company.subscription?.provider === "MERCADO_PAGO" && membership.company.subscription.status === "ACTIVE") {
+    if (membership.company.subscription?.provider === "CAKTO" && membership.company.subscription.status === "ACTIVE") {
       throw new APIError("BAD_REQUEST", { message: "Cancele a assinatura antes de excluir a conta." });
     }
     if (request) companiesPendingDeletion.set(request, membership.companyId);

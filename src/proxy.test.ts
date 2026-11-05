@@ -30,7 +30,7 @@ describe("API request origin proxy", () => {
   });
 
   it("leaves authenticated provider callbacks to their own signature checks", () => {
-    const webhook = proxy(new NextRequest("https://app.example/api/webhooks/mercado-pago", { method: "POST" }));
+    const webhook = proxy(new NextRequest("https://app.example/api/webhooks/cakto", { method: "POST" }));
     expect(webhook.headers.get("x-middleware-next")).toBe("1");
   });
 
