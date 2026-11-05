@@ -69,7 +69,7 @@ export function ExpenseManager({ initial }: { initial: Expense[] }) {
 
   const total = filtered.reduce((sum, e) => sum + e.amountCents, 0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   const byCategory = useMemo(() => {
     const map = new Map<string, { total: number; count: number }>();
     filtered.forEach((e) => {
